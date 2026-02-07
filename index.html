@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Caja</title>
+
+<style>
+body{
+    font-family: Arial;
+    padding:20px;
+}
+table{
+    width:100%;
+    border-collapse: collapse;
+    margin-bottom:20px;
+}
+th, td{
+    border:1px solid #ccc;
+    padding:8px;
+    text-align:center;
+}
+input{
+    width:70px;
+}
+button{
+    padding:10px;
+    margin-top:10px;
+}
+.total-box{
+    font-size:18px;
+    font-weight:bold;
+    margin-bottom:20px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>💵 Billetes</h2>
+<table id="tablaBilletes">
+<tr>
+<th>Valor</th>
+<th>Cantidad</th>
+<th>Total</th>
+</tr>
+
+<tr><td>200</td><td><input type="number" oninput="calcular()"></td><td>0</td></tr>
+<tr><td>100</td><td><input type="number" oninput="calcular()"></td><td>0</td></tr>
+<tr><td>50</td><td><input type="number" oninput="calcular()"></td><td>0</td></tr>
+<tr><td>20</td><td><input type="number" oninput="calcular()"></td><td>0</td></tr>
+<tr><td>10</td><td><input type="number" oninput="calcular()"></td><td>0</td></tr>
+</table>
+
+<div class="total-box">
+Total Billetes: S/ <span id="totalBilletes">0</span>
+</div>
+
+
+<h2>🪙 Monedas</h2>
+<table id="tablaMonedas">
+<tr>
+<th>Valor</th>
+<th>Cantidad</th>
+<th>Total</th>
+</tr>
+
+<tr><td>5</td><td><input type="number" oninput="calcular()"></td><td>0</td></tr>
+<tr><td>2</td><td><input type="number" oninput="calcular()"></td><td>0</td></tr>
+<tr><td>1</td><td><input type="number" oninput="calcular()"></td><td>0</td></tr>
+<tr><td>0.5</td><td><input type="number" oninput="calcular()"></td><td>0</td></tr>
+<tr><td>0.2</td><td><input type="number" oninput="calcular()"></td><td>0</td></tr>
+<tr><td>0.1</td><td><input type="number" oninput="calcular()"></td><td>0</td></tr>
+</table>
+
+<div class="total-box">
+Total Monedas: S/ <span id="totalMonedas">0</span>
+</div>
+
+
+<div class="total-box" style="font-size:20px;">
+Total General: S/ <span id="totalGeneral">0</span>
+</div>
+
+<button onclick="limpiar()">🧹 Limpiar Cantidades</button>
+
+
+<script>
+function calcular() {
+
+    let totalBilletes = 0;
+    let totalMonedas = 0;
+
+    // Billetes
+    let filasBilletes = document.querySelectorAll("#tablaBilletes tr");
+    for (let i = 1; i < filasBilletes.length; i++) {
+        let valor = parseFloat(filasBilletes[i].cells[0].innerText);
+        let cantidad = parseFloat(filasBilletes[i].cells[1].querySelector("input").value) || 0;
+        let total = valor * cantidad;
+
+        filasBilletes[i].cells[2].innerText = total.toFixed(2);
+        totalBilletes += total;
+    }
+
+    // Monedas
+    let filasMonedas = document.querySelectorAll("#tablaMonedas tr");
+    for (let i = 1; i < filasMonedas.length; i++) {
+        let valor = parseFloat(filasMonedas[i].cells[0].innerText);
+        let cantidad = parseFloat(filasMonedas[i].cells[1].querySelector("input").value) || 0;
+        let total = valor * cantidad;
+
+        filasMonedas[i].cells[2].innerText = total.toFixed(2);
+        totalMonedas += total;
+    }
+
+    document.getElementById("totalBilletes").innerText = totalBilletes.toFixed(2);
+    document.getElementById("totalMonedas").innerText = totalMonedas.toFixed(2);
+    document.getElementById("totalGeneral").innerText = (totalBilletes + totalMonedas).toFixed(2);
+}
+
+function limpiar() {
+    let inputs = document.querySelectorAll("input");
+    inputs.forEach(input => input.value = "");
+    calcular();
+}
+</script>
+
+</body>
+</html>
