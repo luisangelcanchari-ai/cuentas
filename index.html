@@ -3,48 +3,100 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistema de Caja</title>
+<title>Sistema de Caja Pro</title>
 
 <style>
 body{
-    font-family: Arial;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg,#1e3c72,#2a5298);
+    margin:0;
     padding:20px;
+    color:white;
 }
+
+.container{
+    max-width:900px;
+    margin:auto;
+    background:white;
+    color:#333;
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.3);
+}
+
+h2{
+    margin-top:30px;
+}
+
 table{
     width:100%;
     border-collapse: collapse;
     margin-bottom:20px;
 }
+
+th{
+    background:#2a5298;
+    color:white;
+}
+
 th, td{
-    border:1px solid #ccc;
-    padding:8px;
+    padding:10px;
+    text-align:center;
+    border-bottom:1px solid #ddd;
+}
+
+input{
+    width:80px;
+    padding:5px;
     text-align:center;
 }
-input{
-    width:70px;
-}
-button{
-    padding:10px;
-    margin-top:10px;
-}
+
 .total-box{
-    font-size:18px;
     font-weight:bold;
-    margin-bottom:20px;
+    margin-bottom:15px;
+    font-size:18px;
+}
+
+.final{
+    font-size:22px;
+    font-weight:bold;
+    color:#1e3c72;
+}
+
+button{
+    padding:10px 15px;
+    margin:5px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.btn-limpiar{
+    background:#e74c3c;
+    color:white;
+}
+
+.btn-exportar{
+    background:#27ae60;
+    color:white;
+}
+
+button:hover{
+    opacity:0.85;
 }
 </style>
 </head>
 
 <body>
 
+<div class="container">
+
+<h1>💰 Sistema de Caja</h1>
+
 <h2>💵 Billetes</h2>
 <table id="tablaBilletes">
-<tr>
-<th>Valor</th>
-<th>Cantidad</th>
-<th>Total</th>
-</tr>
-
+<tr><th>Valor</th><th>Cantidad</th><th>Total</th></tr>
 <tr><td>200</td><td><input type="number" oninput="calcular()"></td><td>0</td></tr>
 <tr><td>100</td><td><input type="number" oninput="calcular()"></td><td>0</td></tr>
 <tr><td>50</td><td><input type="number" oninput="calcular()"></td><td>0</td></tr>
@@ -56,34 +108,49 @@ button{
 Total Billetes: S/ <span id="totalBilletes">0</span>
 </div>
 
-
 <h2>🪙 Monedas</h2>
 <table id="tablaMonedas">
-<tr>
-<th>Valor</th>
-<th>Cantidad</th>
-<th>Total</th>
-</tr>
-
+<tr><th>Valor</th><th>Cantidad</th><th>Total</th></tr>
 <tr><td>5</td><td><input type="number" oninput="calcular()"></td><td>0</td></tr>
 <tr><td>2</td><td><input type="number" oninput="calcular()"></td><td>0</td></tr>
 <tr><td>1</td><td><input type="number" oninput="calcular()"></td><td>0</td></tr>
-<tr><td>0.5</td><td><input type="number" oninput="calcular()"></td><td>0</td></tr>
-<tr><td>0.2</td><td><input type="number" oninput="calcular()"></td><td>0</td></tr>
-<tr><td>0.1</td><td><input type="number" oninput="calcular()"></td><td>0</td></tr>
+<tr><td>0.5</td><td><input type="number" step="0.1" oninput="calcular()"></td><td>0</td></tr>
+<tr><td>0.2</td><td><input type="number" step="0.1" oninput="calcular()"></td><td>0</td></tr>
+<tr><td>0.1</td><td><input type="number" step="0.1" oninput="calcular()"></td><td>0</td></tr>
 </table>
 
 <div class="total-box">
 Total Monedas: S/ <span id="totalMonedas">0</span>
 </div>
 
+<hr>
 
-<div class="total-box" style="font-size:20px;">
-Total General: S/ <span id="totalGeneral">0</span>
+<h2>💳 Otros Ingresos</h2>
+
+<div class="total-box">
+PLIN: S/ <input type="number" id="plin" oninput="calcular()" value="0">
 </div>
 
-<button onclick="limpiar()">🧹 Limpiar Cantidades</button>
+<div class="total-box">
+Transferencia: S/ <input type="number" id="transferencia" oninput="calcular()" value="0">
+</div>
 
+<div class="total-box">
+Descuento: S/ <input type="number" id="descuento" oninput="calcular()" value="0">
+</div>
+
+<hr>
+
+<div class="final">
+Total Recaudado: S/ <span id="totalFinal">0</span>
+</div>
+
+<br>
+
+<button class="btn-limpiar" onclick="limpiar()">🧹 Limpiar</button>
+<button class="btn-exportar" onclick="exportarExcel()">📊 Exportar a Excel</button>
+
+</div>
 
 <script>
 function calcular() {
@@ -91,31 +158,34 @@ function calcular() {
     let totalBilletes = 0;
     let totalMonedas = 0;
 
-    // Billetes
     let filasBilletes = document.querySelectorAll("#tablaBilletes tr");
     for (let i = 1; i < filasBilletes.length; i++) {
         let valor = parseFloat(filasBilletes[i].cells[0].innerText);
         let cantidad = parseFloat(filasBilletes[i].cells[1].querySelector("input").value) || 0;
         let total = valor * cantidad;
-
         filasBilletes[i].cells[2].innerText = total.toFixed(2);
         totalBilletes += total;
     }
 
-    // Monedas
     let filasMonedas = document.querySelectorAll("#tablaMonedas tr");
     for (let i = 1; i < filasMonedas.length; i++) {
         let valor = parseFloat(filasMonedas[i].cells[0].innerText);
         let cantidad = parseFloat(filasMonedas[i].cells[1].querySelector("input").value) || 0;
         let total = valor * cantidad;
-
         filasMonedas[i].cells[2].innerText = total.toFixed(2);
         totalMonedas += total;
     }
 
     document.getElementById("totalBilletes").innerText = totalBilletes.toFixed(2);
     document.getElementById("totalMonedas").innerText = totalMonedas.toFixed(2);
-    document.getElementById("totalGeneral").innerText = (totalBilletes + totalMonedas).toFixed(2);
+
+    let plin = parseFloat(document.getElementById("plin").value) || 0;
+    let transferencia = parseFloat(document.getElementById("transferencia").value) || 0;
+    let descuento = parseFloat(document.getElementById("descuento").value) || 0;
+
+    let totalFinal = totalBilletes + totalMonedas + plin + transferencia - descuento;
+
+    document.getElementById("totalFinal").innerText = totalFinal.toFixed(2);
 }
 
 function limpiar() {
@@ -123,6 +193,83 @@ function limpiar() {
     inputs.forEach(input => input.value = "");
     calcular();
 }
+
+function exportarExcel() {
+
+    let fecha = new Date().toLocaleString();
+
+    let contenido = `
+    <table border="1">
+        <tr><th colspan="3">REPORTE DE CAJA</th></tr>
+        <tr><td colspan="3">Fecha: ${fecha}</td></tr>
+    </table>
+    <br>
+
+    <table border="1">
+        <tr><th colspan="3">BILLETES</th></tr>
+        <tr><th>Valor</th><th>Cantidad</th><th>Total</th></tr>
+    `;
+
+    let filasBilletes = document.querySelectorAll("#tablaBilletes tr");
+    for (let i = 1; i < filasBilletes.length; i++) {
+        let valor = filasBilletes[i].cells[0].innerText;
+        let cantidad = filasBilletes[i].cells[1].querySelector("input").value || 0;
+        let total = filasBilletes[i].cells[2].innerText;
+
+        contenido += `<tr>
+            <td>${valor}</td>
+            <td>${cantidad}</td>
+            <td>${total}</td>
+        </tr>`;
+    }
+
+    contenido += `
+    <tr><td colspan="2"><b>Total Billetes</b></td>
+    <td><b>${document.getElementById("totalBilletes").innerText}</b></td></tr>
+    </table>
+    <br>
+
+    <table border="1">
+        <tr><th colspan="3">MONEDAS</th></tr>
+        <tr><th>Valor</th><th>Cantidad</th><th>Total</th></tr>
+    `;
+
+    let filasMonedas = document.querySelectorAll("#tablaMonedas tr");
+    for (let i = 1; i < filasMonedas.length; i++) {
+        let valor = filasMonedas[i].cells[0].innerText;
+        let cantidad = filasMonedas[i].cells[1].querySelector("input").value || 0;
+        let total = filasMonedas[i].cells[2].innerText;
+
+        contenido += `<tr>
+            <td>${valor}</td>
+            <td>${cantidad}</td>
+            <td>${total}</td>
+        </tr>`;
+    }
+
+    contenido += `
+    <tr><td colspan="2"><b>Total Monedas</b></td>
+    <td><b>${document.getElementById("totalMonedas").innerText}</b></td></tr>
+    </table>
+    <br>
+
+    <table border="1">
+        <tr><th colspan="2">OTROS INGRESOS</th></tr>
+        <tr><td>PLIN</td><td>${document.getElementById("plin").value}</td></tr>
+        <tr><td>Transferencia</td><td>${document.getElementById("transferencia").value}</td></tr>
+        <tr><td>Descuento</td><td>${document.getElementById("descuento").value}</td></tr>
+        <tr><td><b>TOTAL FINAL</b></td>
+        <td><b>${document.getElementById("totalFinal").innerText}</b></td></tr>
+    </table>
+    `;
+
+    let blob = new Blob([contenido], { type: "application/vnd.ms-excel" });
+    let link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "reporte_caja_detallado.xls";
+    link.click();
+}
+
 </script>
 
 </body>
