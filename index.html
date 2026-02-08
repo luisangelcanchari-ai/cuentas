@@ -198,10 +198,10 @@ function exportarExcel() {
 
     let fecha = new Date().toLocaleString();
     let contenido = "REPORTE DE CAJA\n";
-    contenido += "Fecha: " + fecha + "\n\n";
+    contenido += "Fecha;" + fecha + "\n\n";
 
     contenido += "BILLETES\n";
-    contenido += "Valor,Cantidad,Total\n";
+    contenido += "Valor;Cantidad;Total\n";
 
     let filasBilletes = document.querySelectorAll("#tablaBilletes tr");
     for (let i = 1; i < filasBilletes.length; i++) {
@@ -209,13 +209,13 @@ function exportarExcel() {
         let cantidad = filasBilletes[i].cells[1].querySelector("input").value || 0;
         let total = filasBilletes[i].cells[2].innerText;
 
-        contenido += valor + "," + cantidad + "," + total + "\n";
+        contenido += valor + ";" + cantidad + ";" + total + "\n";
     }
 
-    contenido += "\nTotal Billetes," + document.getElementById("totalBilletes").innerText + "\n\n";
+    contenido += "\nTotal Billetes;" + document.getElementById("totalBilletes").innerText + "\n\n";
 
     contenido += "MONEDAS\n";
-    contenido += "Valor,Cantidad,Total\n";
+    contenido += "Valor;Cantidad;Total\n";
 
     let filasMonedas = document.querySelectorAll("#tablaMonedas tr");
     for (let i = 1; i < filasMonedas.length; i++) {
@@ -223,19 +223,21 @@ function exportarExcel() {
         let cantidad = filasMonedas[i].cells[1].querySelector("input").value || 0;
         let total = filasMonedas[i].cells[2].innerText;
 
-        contenido += valor + "," + cantidad + "," + total + "\n";
+        contenido += valor + ";" + cantidad + ";" + total + "\n";
     }
 
-    contenido += "\nTotal Monedas," + document.getElementById("totalMonedas").innerText + "\n\n";
+    contenido += "\nTotal Monedas;" + document.getElementById("totalMonedas").innerText + "\n\n";
 
     contenido += "OTROS INGRESOS\n";
-    contenido += "PLIN," + document.getElementById("plin").value + "\n";
-    contenido += "Transferencia," + document.getElementById("transferencia").value + "\n";
-    contenido += "Descuento," + document.getElementById("descuento").value + "\n\n";
+    contenido += "PLIN;" + document.getElementById("plin").value + "\n";
+    contenido += "Transferencia;" + document.getElementById("transferencia").value + "\n";
+    contenido += "Descuento;" + document.getElementById("descuento").value + "\n\n";
 
-    contenido += "TOTAL FINAL," + document.getElementById("totalFinal").innerText + "\n";
+    contenido += "TOTAL FINAL;" + document.getElementById("totalFinal").innerText + "\n";
 
-    let blob = new Blob([contenido], { type: "text/csv;charset=utf-8;" });
+    // Agregar BOM para que Excel lo reconozca correctamente
+    let blob = new Blob(["\ufeff" + contenido], { type: "text/csv;charset=utf-8;" });
+
     let link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = "reporte_caja.csv";
@@ -243,9 +245,8 @@ function exportarExcel() {
 }
 
 
+
 </script>
 
 </body>
 </html>
-
-
